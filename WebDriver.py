@@ -22,6 +22,7 @@ class Webdrive:
         self.URL = 'https://www.zhanqi.tv/topic/owl'
 
 
+
     #####################################################
     #               Start                               #
     #####################################################
@@ -52,27 +53,31 @@ class Webdrive:
         self.WEBDRIVER.refresh()
 
     #####################################################
+    #               Click                               #
+    #####################################################
+    def click(self, xpath):
+        sleep(random.uniform(0, 1) * 3 + 2)
+        if self.WEBDRIVER.find_element_by_xpath(xpath):
+            self.WEBDRIVER.find_element_by_xpath(xpath).click()  # 签到
+
+    #####################################################
     #               Daily Sign-in                       #
     #####################################################
     def daliy_sign_in(self):
-        sleep(random.uniform(0, 1) * 3)
 
-        if self.WEBDRIVER.find_element_by_xpath('//*[@id="js-fans-sign-btn"]'):
-            self.WEBDRIVER.find_element_by_xpath('//*[@id="js-fans-sign-btn"]').click()  # 签到
+        self.click('//*[@id="js-fans-sign-btn"]') # 签到
+        self.click('/html/body/div[35]/div[2]/button')  # 确定
 
-        sleep(random.uniform(0, 1) * 3)
-        self.WEBDRIVER.find_element_by_xpath('/html/body/div[2]/div[3]/div/div/ul/li[4]/a').click()  # 代币活动
+        self.click('/html/body/div[2]/div[3]/div/div/ul/li[4]/a')  # 代币活动
+        self.click('/html/body/div[2]/div[3]/div/div/div[3]/div[1]/div[2]/div[2]/div[2]/a')  # 签到
+
+        self.click('/html/body/div[2]/div[3]/div/div/ul/li[2]/a') # 皮肤兑换
+        self.click('//*[@id="js-owl-sign"]')  # 签到 每日签到赠送10欢呼值
+        # self.click('//*[@id="js-fans-sign-btn"]')  # 领取
+        # self.click('//*[@id="js-owl-sign"]') # 领取 每日观赛10分钟可获得10欢呼值
 
         # sleep(random.uniform(0, 1) * 3)
-        # if self.WEBDRIVER.find_element_by_xpath('//*[@id="js-owl-sign"]'):
-        #     self.WEBDRIVER.find_element_by_xpath('//*[@id="js-owl-sign"]').click()  # 签到
-        #
-        # sleep(random.uniform(0, 1) * 3)
-        # if self.WEBDRIVER.find_element_by_xpath('//*[@id="js-fans-sign-btn"]'):
-        #     self.WEBDRIVER.find_element_by_xpath('//*[@id="js-fans-sign-btn"]').click()  # 领取
-
-        sleep(random.uniform(0, 1) * 3)
-        self.WEBDRIVER.find_element_by_xpath('/html/body/div[2]/div[3]/div/div/ul/li[2]/a').click()  # 皮肤兑换
+        # print(self.WEBDRIVER.find_element_by_xpath('//*[@id="js-owl-sign"]').text) #test
 
         # sleep(random.uniform(0, 1)*3)
         # self.WEBDRIVER.find_element_by_xpath('//*[@id="js-room-super-panel"]/div/div[2]/div[3]/div[2]/div[2]/ul/li[1]/a/i[2]').click() #我的
@@ -93,7 +98,7 @@ class Webdrive:
     #####################################################
     # def quiz_selection(self):
     #     while True:
-            
+
 
 
 
