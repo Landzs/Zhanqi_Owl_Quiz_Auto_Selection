@@ -1,5 +1,6 @@
 from selenium import webdriver
 from time import sleep
+from time import gmtime, strftime
 import time
 import random
 import re
@@ -23,7 +24,7 @@ class Webdrive:
         self.URL = 'https://www.zhanqi.tv/topic/owl'
         self.START_TIME = 0
         self.EXECUTION_TIME = 0
-
+        self.COINS = 0
 
     #####################################################
     #               Start                               #
@@ -32,8 +33,10 @@ class Webdrive:
         self.WEBDRIVER.get(self.URL)
         self.START_TIME = time.time()
         sleep(random.uniform(0, 1) * 3 + 5)
-        self.WEBDRIVER.refresh()
-
+        # self.WEBDRIVER.refresh()
+        self.write_in_txt(strftime("%d %b %Y", time.localtime()))
+        self.COINS = self.check_coins()
+        print(self.COINS)
 
     #####################################################
     #               Save Cookies                        #
@@ -58,11 +61,37 @@ class Webdrive:
         self.WEBDRIVER.refresh()
 
     #####################################################
+    #               Check Coins                         #
+    #####################################################
+    def check_coins(self):
+        # sleep(random.uniform(0, 1) * 3 + 5)
+        # self.WEBDRIVER.refresh()
+        sleep(random.uniform(0, 1) * 3 + 5)
+        self.click_xpath('/html/body/div[2]/div[3]/div/div/ul/li[4]/a')  # 代币活动
+        sleep(random.uniform(0, 1) * 3 + 5)
+        temp_str = self.WEBDRIVER.find_element_by_xpath('/html/body/div[2]/div[3]/div/div/div[3]/div[2]/div[1]/div/div[2]/span[2]').text
+        temp_num = int(temp_str)
+        temp_str = 'coins: ' + temp_str + '\n'
+        self.write_in_txt(temp_str)
+        return temp_num
+
+
+    #####################################################
     #               Click                               #
     #####################################################
-    def click(self, xpath):
+    def click_xpath(self, xpath):
         sleep(random.uniform(0, 1) * 3 + 5)
         element = self.WEBDRIVER.find_element_by_xpath(xpath)
+        if element and element.is_displayed():
+            element.click()  # 签到
+
+
+    #####################################################
+    #               Click                               #
+    #####################################################
+    def click_selector(self, selector):
+        sleep(random.uniform(0, 1) * 3 + 5)
+        element = self.WEBDRIVER.find_element_by_css_selector(selector)
         if element and element.is_displayed():
             element.click()  # 签到
 
@@ -70,21 +99,17 @@ class Webdrive:
     #               Daily Sign-in                       #
     #####################################################
     def daliy_sign_in(self):
-        #
-        # self.click('//*[@id="js-fans-sign-btn"]') # 签到
-        # self.click('/html/body/div[35]/div[2]/button')  # 确定
-        #
-        # self.click('/html/body/div[2]/div[3]/div/div/ul/li[4]/a')  # 代币活动
-        # self.click('/html/body/div[2]/div[3]/div/div/div[3]/div[1]/div[2]/div[2]/div[2]/a')  # 签到
-        # self.click('/html/body/div[5]/a[2]')  # 知道了
 
-        # self.click('/html/body/div[2]/div[3]/div/div/ul/li[2]/a') # 皮肤兑换
+        self.click('//*[@id="js-fans-sign-btn"]') # 签到
+        self.click('/html/body/div[35]/div[2]/button')  # 确定
+        # / html / body / div[36] / div[2] / button
+        self.click('/html/body/div[2]/div[3]/div/div/ul/li[4]/a')  # 代币活动
+        self.click('/html/body/div[2]/div[3]/div/div/div[3]/div[1]/div[2]/div[2]/div[2]/a')  # 签到
+        self.click('/html/body/div[5]/a[2]')  # 知道了
+
+        self.click('/html/body/div[2]/div[3]/div/div/ul/li[2]/a') # 皮肤兑换
         self.click('//*[@id="js-owl-sign"]')  # 签到 每日签到赠送10欢呼值
-        self.click('//*[@id="js-time-scores"]')  # 领取
-        # self.click('//*[@id="js-owl-sign"]') # 领取 每日观赛10分钟可获得10欢呼值
-
-        # sleep(random.uniform(0, 1) * 3)
-        # print(self.WEBDRIVER.find_element_by_xpath('//*[@id="js-owl-sign"]').text) #test
+        # self.click('//*[@id="js-time-scores"]')  # 领取 每日观赛10分钟可获得10欢呼值
 
         # sleep(random.uniform(0, 1)*3)
         # self.WEBDRIVER.find_element_by_xpath('//*[@id="js-room-super-panel"]/div/div[2]/div[3]/div[2]/div[2]/ul/li[1]/a/i[2]').click() #我的
@@ -95,17 +120,45 @@ class Webdrive:
         # sleep(random.uniform(0, 1) * 3)
         # self.WEBDRIVER.find_element_by_xpath('//*[@id="js-room-task-panel"]/div[2]/div[3]/div[2]/div/ul/li[1]/div[2]/div[2]/a').click()  # 领取
     #####################################################
-    #               Close                       #
+    #                  Close                            #
     #####################################################
     def close(self):
         self.WEBDRIVER.close()
 
+
+    #####################################################
+    #               Get Text                            #
+    #####################################################
+    def get_text_xpath(self, xpath):
+        sleep(random.uniform(0, 1) * 3 + 5)
+        element = self.WEBDRIVER.find_element_by_xpath(xpath)
+        if element and element.is_displayed():
+            return element.text  # 签到
+
+    #####################################################
+    #               Get Text                            #
+    #####################################################
+    def get_text_selector(self, selector):
+        sleep(random.uniform(0, 1) * 3 + 5)
+        element = self.WEBDRIVER.find_element_by_css_selector(selector)
+        if element and element.is_displayed():
+            return element.text  # 签到
+
+
+    #####################################################
+    #                  Get Number                       #
+    #####################################################
     def get_number(self):
         number1 = 0
         number2 = 0
-        element1 = self.WEBDRIVER.find_element_by_xpath('//*[@id="js-flash-panel"]/div[3]/div[1]/div[4]/a[1]/i[2]').text
-        element2 = self.WEBDRIVER.find_element_by_xpath('//*[@id="js-flash-panel"]/div[3]/div[1]/div[4]/a[2]/i[2]').text
-        # print(element1)
+
+        # element1 = self.get_text_xpath('//*[@id="js-flash-panel"]/div[5]/div[1]/div[4]/a[1]/i[2]')  #  #js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.left-team.fl.js-left-area > i.js-score
+        # element2 = self.get_text_xpath('//*[@id="js-flash-panel"]/div[5]/div[1]/div[4]/a[2]/i[2]')  #  #js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.right-team.fr.js-right-area > i.js-score
+
+        element1 = self.get_text_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.left-team.fl.js-left-area > i.js-score")
+        element2 = self.get_text_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.right-team.fr.js-right-area > i.js-score")
+
+        # print(element1)  #js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.left-team.fl.js-left-area
         # print(element2)
         if element1:
             number1 = re.findall(r'\d+', element1)
@@ -116,8 +169,11 @@ class Webdrive:
             print(number2)
         return number1, number2
 
+    #####################################################
+    #              Write In Txt                         #
+    #####################################################
     def write_in_txt(self,write_in):
-        with open("record.txt" % title, "a") as f:  # 格式化字符串还能这么用！
+        with open("record.txt" , "a") as f:  # 格式化字符串还能这么用！
             f.write("\n------------------------------------------------------------------------------\n")
             for i in write_in:
                 f.write(i)
@@ -126,29 +182,45 @@ class Webdrive:
     #               Quiz Selection                      #
     #####################################################
     def quiz_selection(self):
-        while True:
-            self.WEBDRIVER.refresh()
-            sleep(random.uniform(0, 1) * 3 + 10)
+        while self.EXECUTION_TIME < 22500:
+            # self.WEBDRIVER.refresh()
+            # sleep(random.uniform(0, 1) * 3 + 5)
             self.EXECUTION_TIME = time.time() - self.START_TIME
+            #
+            # temp = self.WEBDRIVER.find_element_by_css_selector(".right-team.fr.js-right-area") #"right-team fr js-right-area active"
+            # temp = self.WEBDRIVER.find_element_by_css_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.right-team.fr.js-right-area > i.js-name") #"right-team fr js-right-area active"
+            # if temp:
+            #     print('find')
+            #     print(temp)
+            #     print(self.WEBDRIVER.find_element_by_xpath('//*[@id="js-flash-panel"]/div[5]/div[1]/div[4]/a[2]/i[1]'))
+            #     if temp.text:
+            #         print("temp.text")
+
             number1, number2 = self.get_number()
             if number1 != 0 and number2 != 0:
-                temp_str = "At {:.3f}s".format(self.EXECUTION_TIME) + '\n' + 'A: ' + str(number1) + '\n' + 'B: ' + str(number2) + '\n'
-                print("At {:.3f}s".format(self.EXECUTION_TIME))
+                temp_str = strftime("%H:%M:%S", time.localtime()) + '\n' + 'A: ' + str(number1) + '\n' + 'B: ' + str(number2) + '\n'
                 if number1 > number2:
-                    self.click('//*[@id="js-flash-panel"]/div[3]/div[1]/div[4]/a[1]/i[1]')  # left
+                    # self.click_xpath('//*[@id="js-flash-panel"]/div[5]/div[1]/div[4]/a[1]/i[1]')  # left
+                    self.click_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.left-team.fl.js-left-area > i.js-name")
                     temp_str = temp_str + ' click left!' + '\n'
-                    print(' click left!')
+                    # print(' click left!')
                 else:
-                    self.click('//*[@id="js-flash-panel"]/div[3]/div[1]/div[4]/a[2]/i[1]')  # right
+                    # self.click_xpath('//*[@id="js-flash-panel"]/div[5]/div[1]/div[4]/a[2]/i[1]')  # right
+                    self.click_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.right-team.fr.js-right-area > i.js-name")
                     temp_str = temp_str +  ' click right!' + '\n'
-                    print(' click right!')
-
+                    # print(' click right!')
+                # // *[ @ id = "js-flash-panel"] / div[5] / div[1] / div[3] / div / div[2]
                 self.write_in_txt(temp_str)
-                sleep(random.uniform(0, 1) * 10 + 900)
-            sleep(random.uniform(0, 1) * 3 + 100)
+                print(temp_str)
+                sleep(random.uniform(0, 1) * 10 + 1200)
+            sleep(random.uniform(0, 1) * 3 + 140)
             self.EXECUTION_TIME = time.time() - self.START_TIME
-            # print('next!')
+            print("{:.3f}s".format(self.EXECUTION_TIME))
 
+        self.COINS = self.check_coins() - self.COINS
+        temp_str = 'Get coins: ' + str(self.COINS) + '\n'
+        self.write_in_txt(temp_str)
+        print(self.COINS)
 
 
 #####################################################
@@ -159,4 +231,4 @@ if __name__ == "__main__":
     wd.start()
     # wd.daliy_sign_in()
     wd.quiz_selection()
-    # wd.close()
+    wd.close()
