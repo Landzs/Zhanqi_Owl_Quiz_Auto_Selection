@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.support.ui import WebDriverWait
 from time import sleep
 from time import gmtime, strftime
 import time
@@ -21,6 +22,7 @@ class Webdrive:
         self.OPTIONS.add_argument('--user-data-dir=/home/shuo/.config/google-chrome/Default')  # 设置成用户自己的数据目录
         self.WEBDRIVER = webdriver.Chrome("/usr/bin/chromedriver",
                                           chrome_options=self.OPTIONS)
+        #self.URL = 'https://www.zhanqi.tv/topic/owl'
         self.URL = 'https://www.zhanqi.tv/topic/owl'
         self.START_TIME = 0
         self.EXECUTION_TIME = 0
@@ -31,12 +33,16 @@ class Webdrive:
     #####################################################
     def start(self):
         self.WEBDRIVER.get(self.URL)
+
+
+        #self.WEBDRIVER.get(self.URL)
         self.START_TIME = time.time()
         sleep(random.uniform(0, 1) * 3 + 5)
-        # self.WEBDRIVER.refresh()
+
+        #self.WEBDRIVER.refresh()
         self.write_in_txt(strftime("%d %b %Y", time.localtime()))
-        self.COINS = self.check_coins()
-        print(self.COINS)
+        #self.COINS = self.check_coins()
+        #print(self.COINS)
 
     #####################################################
     #               Save Cookies                        #
@@ -58,7 +64,7 @@ class Webdrive:
         for cookie in cookies:
             self.WEBDRIVER.add_cookie(cookie)
         sleep(random.uniform(0, 1) * 3)
-        self.WEBDRIVER.refresh()
+        #self.WEBDRIVER.refresh()
 
     #####################################################
     #               Check Coins                         #
@@ -93,7 +99,10 @@ class Webdrive:
         sleep(random.uniform(0, 1) * 3 + 5)
         element = self.WEBDRIVER.find_element_by_css_selector(selector)
         if element and element.is_displayed():
+            print("display")
             element.click()  # 签到
+        else:
+            print("not display")
 
     #####################################################
     #               Daily Sign-in                       #
@@ -157,7 +166,7 @@ class Webdrive:
 
         element1 = self.get_text_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.left-team.fl.js-left-area > i.js-score")
         element2 = self.get_text_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.right-team.fr.js-right-area > i.js-score")
-
+        # js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.right-team.fr.js-right-area > i.js-score
         # print(element1)  #js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.left-team.fl.js-left-area
         # print(element2)
         if element1:
@@ -182,9 +191,9 @@ class Webdrive:
     #               Quiz Selection                      #
     #####################################################
     def quiz_selection(self):
-        while self.EXECUTION_TIME < 22500:
-            # self.WEBDRIVER.refresh()
-            # sleep(random.uniform(0, 1) * 3 + 5)
+        while self.EXECUTION_TIME < 22500:#:
+            #self.WEBDRIVER.refresh()
+            sleep(random.uniform(0, 1) * 3 + 5)
             self.EXECUTION_TIME = time.time() - self.START_TIME
             #
             # temp = self.WEBDRIVER.find_element_by_css_selector(".right-team.fr.js-right-area") #"right-team fr js-right-area active"
@@ -199,20 +208,45 @@ class Webdrive:
             number1, number2 = self.get_number()
             if number1 != 0 and number2 != 0:
                 temp_str = strftime("%H:%M:%S", time.localtime()) + '\n' + 'A: ' + str(number1) + '\n' + 'B: ' + str(number2) + '\n'
+
+                js = 'window.open("https://www.zhanqi.tv/topic/owl");'
+                self.WEBDRIVER.execute_script(js)
+                sleep(random.uniform(0, 1) * 3 + 5)
+                now_handle = self.WEBDRIVER.current_window_handle
+                for handles in self.WEBDRIVER.window_handles:
+                    if handles != now_handle:
+                        self.WEBDRIVER.close()
+                        self.WEBDRIVER.switch_to.window(handles)
+
+
+                #self.WEBDRIVER.refresh()
+                sleep(random.uniform(0, 1) * 3 + 5)
                 if number1 > number2:
                     # self.click_xpath('//*[@id="js-flash-panel"]/div[5]/div[1]/div[4]/a[1]/i[1]')  # left
-                    self.click_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.left-team.fl.js-left-area > i.js-name")
+                    #self.click_selector(
+                        # "#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.left-team.fl.js-left-area > i.js-name")            #owl
+                          # js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.right-team.fr.js-right-area
+                    self.click_selector(
+                        "#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.left-team.fl.js-left-area")
+                        # js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.left-team.fl.js-left-area
+                        # js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.left-team.fl.js-left-area
+                        #"#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.left-team.fl.js-left-area > i.js-name")                  #owwc
+                        ##js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.right-team.fr.js-right-area
                     temp_str = temp_str + ' click left!' + '\n'
                     # print(' click left!')
                 else:
                     # self.click_xpath('//*[@id="js-flash-panel"]/div[5]/div[1]/div[4]/a[2]/i[1]')  # right
-                    self.click_selector("#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.right-team.fr.js-right-area > i.js-name")
+                    #self.click_selector(
+                        # "#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix > a.right-team.fr.js-right-area > i.js-name")         #owl
+                    self.click_selector(
+                        "#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.right-team.fr.js-right-area")  # owwc
+                        #"#js-flash-panel > div.active-guess-ibox > div.js-main > div.guess-content.clearfix.active > a.right-team.fr.js-right-area > i.js-name")                #owwc
                     temp_str = temp_str +  ' click right!' + '\n'
                     # print(' click right!')
                 # // *[ @ id = "js-flash-panel"] / div[5] / div[1] / div[3] / div / div[2]
                 self.write_in_txt(temp_str)
                 print(temp_str)
-                sleep(random.uniform(0, 1) * 10 + 1200)
+                sleep(random.uniform(0, 1) * 10 + 800)
             sleep(random.uniform(0, 1) * 3 + 140)
             self.EXECUTION_TIME = time.time() - self.START_TIME
             print("{:.3f}s".format(self.EXECUTION_TIME))
@@ -229,6 +263,7 @@ class Webdrive:
 if __name__ == "__main__":
     wd = Webdrive()
     wd.start()
-    # wd.daliy_sign_in()
+    #sleep(1200)
+    #wd.daliy_sign_in()
     wd.quiz_selection()
     wd.close()
